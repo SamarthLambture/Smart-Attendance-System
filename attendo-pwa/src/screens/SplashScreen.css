@@ -1,0 +1,209 @@
+/* ========================================
+   ENHANCED SPLASH SCREEN CSS
+   ======================================== */
+
+.splash-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated background particles */
+.splash-screen::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: 
+    radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: 0 0, 25px 25px;
+  animation: particleMove 20s linear infinite;
+}
+
+@keyframes particleMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.splash-content {
+  text-align: center;
+  z-index: 1;
+  animation: fadeIn 1s ease-out;
+}
+
+.splash-icon-container {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 30px;
+  position: relative;
+  animation: bounceIn 1s ease-out;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-45deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.splash-icon-container svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+/* Pulsing glow effect */
+.splash-icon-container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.4), transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.splash-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 10px;
+  letter-spacing: 2px;
+  animation: slideUp 0.8s ease-out 0.3s backwards;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.splash-subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 40px;
+  animation: slideUp 0.8s ease-out 0.5s backwards;
+  letter-spacing: 1px;
+}
+
+.splash-loader {
+  width: 200px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  margin: 0 auto;
+  overflow: hidden;
+  animation: slideUp 0.8s ease-out 0.7s backwards;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.loader-bar {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0.8) 0%, 
+    rgba(255,255,255,1) 50%, 
+    rgba(255,255,255,0.8) 100%);
+  background-size: 200% 100%;
+  border-radius: 10px;
+  animation: loadingBar 1.5s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+
+@keyframes loadingBar {
+  0% {
+    width: 0%;
+    background-position: 0% 50%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 100%;
+    background-position: 100% 50%;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .splash-icon-container {
+    width: 100px;
+    height: 100px;
+  }
+
+  .splash-title {
+    font-size: 36px;
+  }
+
+  .splash-subtitle {
+    font-size: 16px;
+  }
+
+  .splash-loader {
+    width: 160px;
+  }
+}

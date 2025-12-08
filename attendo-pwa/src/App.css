@@ -1,0 +1,712 @@
+/* ========================================
+   ENHANCED APP.CSS WITH ANIMATIONS
+   ======================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #F3F4F6;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+.slide-down {
+  animation: slideDown 0.5s ease-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.scale-in {
+  animation: scaleIn 0.4s ease-out;
+}
+
+.bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ========================================
+   CONTAINER STYLES
+   ======================================== */
+
+.screen-container {
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+}
+
+.full-screen {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ========================================
+   CARD STYLES
+   ======================================== */
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 500px;
+  animation: slideUp 0.5s ease-out;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover::before {
+  left: 100%;
+}
+
+/* ========================================
+   HEADER STYLES
+   ======================================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.5s ease-out;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: 700;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.header-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 4px;
+  animation: fadeIn 1s ease-out;
+}
+
+/* ========================================
+   TYPOGRAPHY
+   ======================================== */
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 10px;
+  animation: slideDown 0.6s ease-out;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #6B7280;
+  margin-bottom: 25px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* ========================================
+   INPUT STYLES
+   ======================================== */
+
+.input-group {
+  margin-bottom: 20px;
+  animation: slideUp 0.6s ease-out;
+}
+
+.input-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: #F9FAFB;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+}
+
+.input-field:hover {
+  border-color: #D1D5DB;
+  background: white;
+}
+
+/* ========================================
+   BUTTON STYLES
+   ======================================== */
+
+.btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.7s ease-out;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-success:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(107, 114, 128, 0.4);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(107, 114, 128, 0.5);
+}
+
+.btn-white {
+  background: white;
+  color: #374151;
+  border: 2px solid #E5E7EB;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.btn-white:hover:not(:disabled) {
+  background: #F9FAFB;
+  border-color: #D1D5DB;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(-5px);
+}
+
+/* ========================================
+   ICON CONTAINER
+   ======================================== */
+
+.icon-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  animation: scaleIn 0.6s ease-out, pulse 2s ease-in-out infinite 1s;
+  margin: 0 auto 20px;
+}
+
+/* ========================================
+   CHECKBOX STYLES
+   ======================================== */
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: slideUp 0.5s ease-out;
+  background: white;
+}
+
+.checkbox-container:hover {
+  border-color: #667eea;
+  background: #F9FAFB;
+  transform: translateX(5px);
+}
+
+.checkbox-container.selected {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #D1D5DB;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.checkbox.checked {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  animation: scaleIn 0.3s ease-out;
+}
+
+.checkbox-inner {
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 3px;
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* ========================================
+   GRID LAYOUT
+   ======================================== */
+
+.grid {
+  display: grid;
+  gap: 12px;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* ========================================
+   MENU & SIDEBAR
+   ======================================== */
+
+.menu-item {
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideInLeft 0.5s ease-out;
+}
+
+.menu-item:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  transform: translateX(5px);
+}
+
+/* ========================================
+   CAMERA STYLES
+   ======================================== */
+
+.camera-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.camera-preview {
+  border: 3px solid #667eea;
+  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+  animation: scaleIn 0.5s ease-out;
+}
+
+/* ========================================
+   LINK STYLES
+   ======================================== */
+
+.link {
+  color: #667eea;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  position: relative;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+}
+
+.link:hover {
+  color: #764ba2;
+}
+
+.link:hover::after {
+  width: 100%;
+}
+
+/* ========================================
+   SUCCESS MESSAGE
+   ======================================== */
+
+.success-message {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #059669;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideDown 0.5s ease-out;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+}
+
+/* ========================================
+   ERROR MESSAGE
+   ======================================== */
+
+.error-message {
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  color: #DC2626;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  text-align: center;
+  animation: slideDown 0.5s ease-out;
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.2);
+}
+
+/* ========================================
+   LOADING SPINNER
+   ======================================== */
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: rotate 0.8s linear infinite;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  .card {
+    padding: 24px;
+    border-radius: 16px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  .btn {
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================
+   STAGGER ANIMATIONS
+   ======================================== */
+
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+.stagger-item:nth-child(6) { animation-delay: 0.6s; }
+
+/* ========================================
+   GLASSMORPHISM EFFECT
+   ======================================== */
+
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   FLOATING ELEMENTS
+   ======================================== */
+
+.floating {
+  animation: bounce 3s ease-in-out infinite;
+}
+
+/* ========================================
+   GRADIENT TEXT
+   ======================================== */
+
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
