@@ -7,6 +7,7 @@ const StudentHomeScreen = () => {
   const [studentName, setStudentName] = useState("");
   const [rollNumber, setRollNumber] = useState("");
   const [subjects, setSubjects] = useState([]);
+  const [attendanceStats, setAttendanceStats] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [greeting, setGreeting] = useState("");
@@ -36,11 +37,29 @@ const StudentHomeScreen = () => {
           const enrolledSubjects = await apiService.getStudentSubjects(userData.email);
           setSubjects(enrolledSubjects);
           
-          // Also store in localStorage for offline access
+          // Fetch attendance stats for each subject
+          const stats = {};
+          for (const subject of enrolledSubjects) {
+            try {
+              const subjectStats = await apiService.getAttendanceStats(
+                userData.email,
+                subject.id
+              );
+              stats[subject.id] = subjectStats;
+            } catch (err) {
+              console.error(`Failed to fetch stats for ${subject.subject_code}:`, err);
+              stats[subject.id] = {
+                total_classes: 0,
+                attended_classes: 0,
+                attendance_percentage: 0
+              };
+            }
+          }
+          setAttendanceStats(stats);
+          
           localStorage.setItem("selected_subjects", JSON.stringify(enrolledSubjects));
         } catch (err) {
           console.error("Failed to fetch subjects:", err);
-          // Fallback to localStorage if API fails
           const storedSubjects = localStorage.getItem("selected_subjects");
           if (storedSubjects) {
             setSubjects(JSON.parse(storedSubjects));
@@ -77,15 +96,11 @@ const StudentHomeScreen = () => {
   };
 
   const getSubjectAttendance = (subjectId) => {
-    const attendanceData = {
-      1: { total: 10, present: 9, percentage: 90 },
-      2: { total: 12, present: 10, percentage: 83 },
-      3: { total: 15, present: 12, percentage: 80 },
-      4: { total: 8, present: 7, percentage: 88 },
-      5: { total: 11, present: 8, percentage: 73 },
-      6: { total: 9, present: 8, percentage: 89 },
+    return attendanceStats[subjectId] || {
+      total_classes: 0,
+      attended_classes: 0,
+      attendance_percentage: 0
     };
-    return attendanceData[subjectId] || { total: 10, present: 8, percentage: 80 };
   };
 
   if (loading) {
@@ -171,7 +186,6 @@ const StudentHomeScreen = () => {
         {/* Menu Items */}
         <div style={{ padding: "20px" }}>
           <div
-            className="menu-item"
             onClick={() => {
               setSidebarOpen(false);
               navigate("/student-profile");
@@ -201,7 +215,6 @@ const StudentHomeScreen = () => {
           </div>
 
           <div
-            className="menu-item"
             style={{
               color: "#DC2626",
               display: "flex",
@@ -275,7 +288,7 @@ const StudentHomeScreen = () => {
 
       {/* SUCCESS MESSAGE */}
       {successMessage && (
-        <div className="slide-down" style={{
+        <div style={{
           background: "linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)",
           color: "#059669",
           padding: "16px 20px",
@@ -306,7 +319,14 @@ const StudentHomeScreen = () => {
         </h3>
 
         {subjects.length === 0 ? (
-          <div className="card scale-in" style={{ textAlign: "center", padding: "60px 20px" }}>
+          <div style={{ 
+            background: "white",
+            borderRadius: "20px",
+            padding: "60px 20px",
+            textAlign: "center",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+            animation: "scaleIn 0.6s ease-out"
+          }}>
             <div style={{
               fontSize: "64px",
               marginBottom: "20px",
@@ -321,9 +341,18 @@ const StudentHomeScreen = () => {
               Add subjects to start marking attendance
             </p>
             <button
-              className="btn btn-primary"
               onClick={() => navigate("/select-subjects")}
-              style={{ maxWidth: "250px", margin: "0 auto" }}
+              style={{
+                padding: "14px 32px",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                color: "white",
+                border: "none",
+                borderRadius: "12px",
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: "pointer",
+                boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)"
+              }}
             >
               Add Subjects
             </button>
@@ -332,17 +361,20 @@ const StudentHomeScreen = () => {
           <div style={{ display: "grid", gap: "16px" }}>
             {subjects.map((s, index) => {
               const attendance = getSubjectAttendance(s.id);
+              const percentage = attendance.attendance_percentage;
+              const isGoodAttendance = percentage >= 85;
+
               return (
                 <div
                   key={s.id}
-                  className="card stagger-item"
                   style={{
+                    background: "white",
+                    borderRadius: "20px",
                     padding: "20px",
                     cursor: "pointer",
                     transition: "all 0.3s ease",
                     animation: `slideUp 0.5s ease-out ${index * 0.1}s backwards`,
-                    position: "relative",
-                    overflow: "hidden"
+                    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)"
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "translateY(-5px) scale(1.02)";
@@ -384,7 +416,7 @@ const StudentHomeScreen = () => {
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
                       <div style={{ textAlign: "center", flex: 1 }}>
                         <div style={{ fontSize: "20px", fontWeight: "700", color: "#667eea" }}>
-                          {attendance.present}/{attendance.total}
+                          {attendance.attended_classes}/{attendance.total_classes}
                         </div>
                         <div style={{ fontSize: "11px", color: "#6B7280", marginTop: "2px" }}>Classes</div>
                       </div>
@@ -397,9 +429,9 @@ const StudentHomeScreen = () => {
                         <div style={{ 
                           fontSize: "20px", 
                           fontWeight: "700",
-                          color: attendance.percentage >= 75 ? "#10B981" : attendance.percentage >= 60 ? "#F59E0B" : "#EF4444"
+                          color: isGoodAttendance ? "#10B981" : "#EF4444"
                         }}>
-                          {attendance.percentage}%
+                          {percentage.toFixed(1)}%
                         </div>
                         <div style={{ fontSize: "11px", color: "#6B7280", marginTop: "2px" }}>Attendance</div>
                       </div>
@@ -414,12 +446,10 @@ const StudentHomeScreen = () => {
                       overflow: "hidden"
                     }}>
                       <div style={{
-                        width: `${attendance.percentage}%`,
+                        width: `${percentage}%`,
                         height: "100%",
-                        background: attendance.percentage >= 75 
+                        background: isGoodAttendance
                           ? "linear-gradient(90deg, #10B981, #059669)" 
-                          : attendance.percentage >= 60 
-                          ? "linear-gradient(90deg, #F59E0B, #D97706)"
                           : "linear-gradient(90deg, #EF4444, #DC2626)",
                         borderRadius: "10px",
                         transition: "width 1s ease-out"
@@ -428,9 +458,19 @@ const StudentHomeScreen = () => {
                   </div>
 
                   <button
-                    className="btn btn-primary"
-                    style={{ width: "100%", marginTop: "10px" }}
                     onClick={() => navigate("/qr-scanner", { state: { subject: s, rollNumber } })}
+                    style={{
+                      width: "100%",
+                      padding: "14px",
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "12px",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)"
+                    }}
                   >
                     <span style={{ marginRight: "8px" }}>📷</span>
                     Scan QR Code
@@ -442,6 +482,32 @@ const StudentHomeScreen = () => {
         )}
       </div>
 
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes slideDown {
+          from { transform: translateY(-100%); }
+          to { transform: translateY(0); }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideInLeft {
+          from { transform: translateX(-30px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+      `}</style>
     </div>
   );
 };

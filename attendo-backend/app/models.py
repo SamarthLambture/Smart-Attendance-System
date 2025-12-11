@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Table, Float
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
@@ -75,9 +75,9 @@ class AttendanceSession(Base):
     id = Column(Integer, primary_key=True, index=True)
     faculty_id = Column(Integer, ForeignKey("faculty.id"), nullable=False)
     subject_id = Column(Integer, ForeignKey("subjects.id"), nullable=False)
-    qr_code = Column(String, unique=True, nullable=False)
-    location_lat = Column(String, nullable=True)
-    location_lng = Column(String, nullable=True)
+    session_code = Column(String, unique=True, nullable=False, index=True)  # The attendance code
+    qr_data = Column(String, nullable=False)  # QR code data (same as session_code)
+    date = Column(DateTime, default=datetime.utcnow)  # Session date
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     expires_at = Column(DateTime, nullable=False)
@@ -93,9 +93,9 @@ class AttendanceRecord(Base):
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("students.id"), nullable=False)
     session_id = Column(Integer, ForeignKey("attendance_sessions.id"), nullable=False)
+    subject_id = Column(Integer, ForeignKey("subjects.id"), nullable=False)  # Direct reference
     marked_at = Column(DateTime, default=datetime.utcnow)
-    location_lat = Column(String, nullable=True)
-    location_lng = Column(String, nullable=True)
+    photo_path = Column(String, nullable=False)  # Path to attendance photo
     is_valid = Column(Boolean, default=True)
     
     # Relationships

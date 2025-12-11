@@ -21,6 +21,7 @@ import FacultyOTPVerificationScreen from './screens/FacultyOTPVerificationScreen
 import FacultySubjectSelectionScreen from './screens/FacultySubjectSelectionScreen';
 import FacultyHomeScreen from './screens/FacultyHomeScreen';
 import FacultyQRGeneratorScreen from './screens/FacultyQRGeneratorScreen';
+import FacultyAttendanceRegisterScreen from './screens/FacultyAttendanceRegisterScreen';
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
           {/* Faculty App Routes */}
           <Route path="/faculty-home" element={<FacultyHomeScreen />} />
           <Route path="/faculty-qr-generator" element={<FacultyQRGeneratorScreen />} />
+          <Route path="/faculty-attendance-register" element={<FacultyAttendanceRegisterScreen />} />
           
           {/* Catch all - redirect to splash */}
           <Route path="*" element={<Navigate to="/" replace />} />

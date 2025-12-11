@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.database import engine, Base
-from app.routers import auth, subjects
+from app.routers import auth, subjects, attendance
 import os
 
 # Create database tables
@@ -31,6 +31,7 @@ if os.path.exists("photos"):
 # Include routers
 app.include_router(auth.router)
 app.include_router(subjects.router)
+app.include_router(attendance.router)  
 
 @app.get("/")
 async def root():

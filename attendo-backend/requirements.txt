@@ -1,3 +1,36 @@
+# # FastAPI and server
+# fastapi==0.104.1
+# uvicorn[standard]==0.24.0
+# python-multipart==0.0.6
+
+# # Database
+# sqlalchemy==2.0.23
+# psycopg2-binary==2.9.9
+# alembic==1.12.1
+
+# # Security and Auth
+# python-jose[cryptography]==3.3.0
+# passlib[bcrypt]==1.7.4
+# python-dotenv==1.0.0
+
+# # Email
+# fastapi-mail==1.4.1
+
+# # Image handling
+# Pillow==10.1.0
+
+# # CORS
+# fastapi-cors==0.0.6
+
+# # Validation
+# pydantic==2.5.0
+# pydantic-settings==2.1.0
+# email-validator==2.1.0
+
+# # Utilities
+# python-dateutil==2.8.2
+
+
 # FastAPI and server
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
@@ -6,26 +39,25 @@ python-multipart==0.0.6
 # Database
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
-alembic==1.12.1
-
-# Security and Auth
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-dotenv==1.0.0
 
 # Email
 fastapi-mail==1.4.1
 
-# Image handling
-Pillow==10.1.0
+# Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.0
 
-# CORS
-fastapi-cors==0.0.6
-
-# Validation
+# Pydantic
 pydantic==2.5.0
 pydantic-settings==2.1.0
-email-validator==2.1.0
 
-# Utilities
-python-dateutil==2.8.2
+# 🆕 YOUR Face Recognition Dependencies (InsightFace)
+insightface==0.7.3
+onnxruntime==1.18.0
+opencv-python==4.9.0.80
+numpy==1.26.4
+
+# Additional dependencies for InsightFace
+scikit-image==0.24.0
+Pillow==10.1.0

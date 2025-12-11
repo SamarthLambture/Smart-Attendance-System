@@ -380,7 +380,7 @@ const FacultyHomeScreen = () => {
                   
                   <button
                     className="btn btn-secondary"
-                    onClick={() => navigate("/faculty-attendance-history", { state: { subject: s } })}
+                    onClick={() => navigate("/faculty-attendance-register", { state: { subject: s } })}
                   >
                     <span style={{ marginRight: "8px" }}>📊</span>
                     View Records

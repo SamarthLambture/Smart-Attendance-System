@@ -1,30 +1,36 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import apiService from "../services/api";
 
 const AttendanceFormScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const code = location.state?.code || "";
+  const { code, subject } = location.state || {};
 
-  const [subjects, setSubjects] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState(subject?.id || "");
   const [rollNumber, setRollNumber] = useState("");
   const [photo, setPhoto] = useState(null);
+  const [photoBlob, setPhotoBlob] = useState(null);
   const [stream, setStream] = useState(null);
   const [cameraActive, setCameraActive] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [attendanceData, setAttendanceData] = useState(null);
 
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
-    const storedSubjects = localStorage.getItem("selected_subjects");
     const storedRoll = localStorage.getItem("roll_number");
-    if (storedSubjects) setSubjects(JSON.parse(storedSubjects));
     if (storedRoll) setRollNumber(storedRoll);
+
+    if (!code) {
+      alert("No attendance code provided");
+      navigate("/student-home");
+    }
 
     return () => {
       if (stream) {
@@ -33,84 +39,176 @@ const AttendanceFormScreen = () => {
     };
   }, []);
 
+
   const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: "user",
-          width: { ideal: 640 },
-          height: { ideal: 480 }
-        } 
+  try {
+    setVideoReady(false);
+    setCameraActive(true);
+
+    const mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "user",
+        width: { ideal: 640 },
+        height: { ideal: 480 },
+      },
+    });
+
+    setStream(mediaStream);
+
+    if (!videoRef.current) return;
+
+    videoRef.current.srcObject = mediaStream;
+
+    // Fix: use the "loadeddata" event (fires later & reliably on all devices)
+    const handleLoadedData = () => {
+      videoRef.current.play().then(() => {
+        setTimeout(() => {
+          setVideoReady(true);
+        }, 300);
+      }).catch((err) => {
+        console.error("Play error:", err);
+        setVideoReady(true);
       });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        videoRef.current.play().catch(err => {
-          console.error("Video play error:", err);
-          alert("Failed to start video preview");
-        });
-      }
-      
-      setStream(mediaStream);
-      setCameraActive(true);
-    } catch (err) {
-      console.error("Camera error:", err);
-      alert("Unable to access camera. Please grant camera permissions.");
+    };
+
+    // Attach event **before** video loads
+    videoRef.current.addEventListener("loadeddata", handleLoadedData, { once: true });
+
+    // Safety fallback (in case video loads instantly)
+    if (videoRef.current.readyState >= 3) {
+      handleLoadedData();
     }
-  };
+
+  } catch (err) {
+    console.error("Camera error:", err);
+    setCameraActive(false);
+    setStream(null);
+
+    if (err.name === "NotAllowedError") {
+      alert("Camera permission denied. Please enable camera access & refresh.");
+    } else if (err.name === "NotFoundError") {
+      alert("No camera found on this device.");
+    } else if (err.name === "NotReadableError") {
+      alert("Camera is in use by another application.");
+    } else {
+      alert("Unable to access camera: " + err.message);
+    }
+  }
+};
+
 
   const capturePhoto = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
 
-    if (!video || video.videoWidth === 0) {
-      alert("Video not ready. Please wait a moment and try again.");
+    if (!video) {
+      alert("Video element not found. Please restart the camera.");
       return;
     }
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    // Force set dimensions even if video isn't fully ready
+    const width = video.videoWidth || 640;
+    const height = video.videoHeight || 480;
 
-    const context = canvas.getContext("2d");
-    context.drawImage(video, 0, 0);
+    if (width === 0 || height === 0) {
+      alert("Camera feed not available. Please allow camera access and try again.");
+      return;
+    }
 
-    const imageData = canvas.toDataURL("image/png");
-    setPhoto(imageData);
+    try {
+      canvas.width = width;
+      canvas.height = height;
 
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setCameraActive(false);
-      setStream(null);
+      const context = canvas.getContext("2d");
+      context.drawImage(video, 0, 0, width, height);
+
+      const imageData = canvas.toDataURL("image/png");
+      setPhoto(imageData);
+
+      // Convert to blob for API upload
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], "photo.png", { type: "image/png" });
+          setPhotoBlob(blob);
+        } else {
+          alert("Failed to create image. Please try again.");
+        }
+      }, 'image/png');
+
+      // Stop camera after capture
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        setCameraActive(false);
+        setStream(null);
+        setVideoReady(false);
+      }
+    } catch (err) {
+      console.error("Capture error:", err);
+      alert("Failed to capture photo. Please try again.");
     }
   };
 
   const retakePhoto = () => {
     setPhoto(null);
+    setPhotoBlob(null);
+    setVideoReady(false);
     startCamera();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedSubject || !rollNumber || !photo) {
+    if (!selectedSubject || !rollNumber || !photoBlob) {
       alert("Please fill all fields and capture your photo.");
       return;
     }
 
     setSubmitting(true);
 
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const userData = JSON.parse(localStorage.getItem("user_data") || "{}");
+      
+      if (!userData.email) {
+        throw new Error("User email not found. Please login again.");
+      }
+
+      // Mark attendance via API
+      const response = await apiService.markAttendance(
+        code,
+        selectedSubject,
+        userData.email,
+        photoBlob
+      );
+
+      // Get updated attendance stats
+      const stats = await apiService.getAttendanceStats(
+        userData.email,
+        selectedSubject
+      );
+
+      setAttendanceData({
+        ...stats,
+        rollNumber,
+        subjectCode: subject?.subject_code || "",
+        date: today
+      });
+
       setSuccess(true);
 
       setTimeout(() => {
-        localStorage.setItem("attendance_success", "Attendance marked successfully!");
         navigate("/student-home");
-      }, 2500);
-    }, 1500);
+      }, 3000);
+
+    } catch (error) {
+      setSubmitting(false);
+      alert(error.message || "Failed to mark attendance. Please try again.");
+    }
   };
 
-  if (success) {
+  if (success && attendanceData) {
+    const percentage = attendanceData.attendance_percentage;
+    const isGoodAttendance = percentage >= 85;
+
     return (
       <div style={{
         minHeight: "100vh",
@@ -172,18 +270,51 @@ const AttendanceFormScreen = () => {
             <div style={{ display: "grid", gap: "10px", textAlign: "left" }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "#6B7280", fontWeight: "500" }}>Roll Number:</span>
-                <span style={{ fontWeight: "600", color: "#1F2937" }}>{rollNumber}</span>
+                <span style={{ fontWeight: "600", color: "#1F2937" }}>{attendanceData.rollNumber}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "#6B7280", fontWeight: "500" }}>Date:</span>
-                <span style={{ fontWeight: "600", color: "#1F2937" }}>{today}</span>
+                <span style={{ fontWeight: "600", color: "#1F2937" }}>{attendanceData.date}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "#6B7280", fontWeight: "500" }}>Subject:</span>
                 <span style={{ fontWeight: "600", color: "#1F2937" }}>
-                  {subjects.find(s => s.id === selectedSubject)?.code}
+                  {attendanceData.subjectCode}
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* Attendance Stats */}
+          <div style={{
+            background: isGoodAttendance 
+              ? "linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)"
+              : "linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)",
+            padding: "20px",
+            borderRadius: "12px",
+            marginBottom: "25px"
+          }}>
+            <div style={{ 
+              fontSize: "48px", 
+              fontWeight: "700",
+              color: isGoodAttendance ? "#059669" : "#DC2626",
+              marginBottom: "10px"
+            }}>
+              {percentage}%
+            </div>
+            <div style={{ 
+              fontSize: "14px", 
+              color: isGoodAttendance ? "#059669" : "#DC2626",
+              fontWeight: "600",
+              marginBottom: "10px"
+            }}>
+              Current Attendance
+            </div>
+            <div style={{ 
+              fontSize: "12px", 
+              color: "#6B7280"
+            }}>
+              {attendanceData.attended_classes} / {attendanceData.total_classes} classes attended
             </div>
           </div>
 
@@ -358,7 +489,7 @@ const AttendanceFormScreen = () => {
               />
             </div>
 
-            <div style={{ marginBottom: "25px" }}>
+            <div style={{ marginBottom: "20px" }}>
               <label style={{
                 display: "block",
                 fontSize: "14px",
@@ -366,12 +497,12 @@ const AttendanceFormScreen = () => {
                 color: "#374151",
                 marginBottom: "8px"
               }}>
-                Select Subject
+                Subject
               </label>
-              <select 
-                value={selectedSubject} 
-                onChange={(e) => setSelectedSubject(e.target.value)} 
-                required
+              <input 
+                type="text"
+                value={subject?.subject_name || ""}
+                readOnly
                 style={{
                   width: "100%",
                   padding: "12px 16px",
@@ -379,17 +510,10 @@ const AttendanceFormScreen = () => {
                   border: "2px solid #E5E7EB",
                   borderRadius: "10px",
                   boxSizing: "border-box",
-                  background: "white",
-                  outline: "none"
+                  background: "#F9FAFB",
+                  color: "#6B7280"
                 }}
-              >
-                <option value="">Choose a subject</option>
-                {subjects.map((subject) => (
-                  <option key={subject.id} value={subject.id}>
-                    {subject.name} ({subject.code})
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div style={{ marginBottom: "25px" }}>
@@ -440,40 +564,85 @@ const AttendanceFormScreen = () => {
 
               {cameraActive && !photo && (
                 <div>
-                  <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    playsInline 
-                    muted
-                    style={{ 
-                      width: "100%", 
-                      borderRadius: "16px",
-                      border: "3px solid #667eea",
-                      boxShadow: "0 10px 40px rgba(102, 126, 234, 0.3)",
-                      minHeight: "300px",
-                      maxHeight: "400px",
-                      objectFit: "cover",
-                      background: "#000"
-                    }}
-                  />
-                  <button 
-                    type="button" 
-                    onClick={capturePhoto} 
-                    style={{
-                      width: "100%",
-                      marginTop: "15px",
-                      background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
-                      color: "white",
-                      border: "none",
-                      padding: "14px",
-                      borderRadius: "12px",
-                      fontSize: "16px",
-                      fontWeight: "600",
-                      cursor: "pointer"
-                    }}
-                  >
-                    📸 Capture Photo
-                  </button>
+                  <div style={{ position: "relative" }}>
+                    <video 
+                      ref={videoRef} 
+                      autoPlay 
+                      playsInline 
+                      muted
+                      style={{ 
+                        width: "100%", 
+                        borderRadius: "16px",
+                        border: "3px solid #667eea",
+                        boxShadow: "0 10px 40px rgba(102, 126, 234, 0.3)",
+                        minHeight: "300px",
+                        maxHeight: "400px",
+                        objectFit: "cover",
+                        background: "#000"
+                      }}
+                    />
+                    {!videoReady && (
+                      <div style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        color: "white",
+                        background: "rgba(0,0,0,0.7)",
+                        padding: "12px 24px",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        textAlign: "center"
+                      }}>
+                        <div>Loading camera...</div>
+                        <div style={{ fontSize: "12px", marginTop: "8px", opacity: 0.8 }}>
+                          If stuck, try clicking capture anyway
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
+                    <button 
+                      type="button" 
+                      onClick={capturePhoto}
+                      style={{
+                        flex: 1,
+                        background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                        color: "white",
+                        border: "none",
+                        padding: "14px",
+                        borderRadius: "12px",
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        cursor: "pointer"
+                      }}
+                    >
+                      📸 Capture Photo
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        if (stream) {
+                          stream.getTracks().forEach(track => track.stop());
+                        }
+                        setCameraActive(false);
+                        setStream(null);
+                        setVideoReady(false);
+                      }}
+                      style={{
+                        padding: "14px 20px",
+                        background: "#EF4444",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "12px",
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        cursor: "pointer"
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -545,19 +714,19 @@ const AttendanceFormScreen = () => {
 
             <button
               type="submit"
-              disabled={submitting || !photo || !selectedSubject}
+              disabled={submitting || !photoBlob || !selectedSubject}
               style={{
                 width: "100%",
                 padding: "16px",
                 fontSize: "18px",
                 fontWeight: "700",
                 color: "white",
-                background: submitting || !photo || !selectedSubject
+                background: submitting || !photoBlob || !selectedSubject
                   ? "#9CA3AF"
                   : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 border: "none",
                 borderRadius: "12px",
-                cursor: submitting || !photo || !selectedSubject ? "not-allowed" : "pointer",
+                cursor: submitting || !photoBlob || !selectedSubject ? "not-allowed" : "pointer",
                 boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)"
               }}
             >
@@ -566,6 +735,21 @@ const AttendanceFormScreen = () => {
           </form>
         </div>
       </div>
+
+      <style>{`
+        @keyframes scaleIn {
+          from { transform: scale(0); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+      `}</style>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import apiService from '../services/api';
 
 const CodeEntryScreen = () => {
   const navigate = useNavigate();
@@ -10,21 +11,29 @@ const CodeEntryScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!code.trim()) {
       setError('Please enter attendance code');
+      return;
+    }
+
+    if (!subject) {
+      setError('Subject information missing');
       return;
     }
 
     setLoading(true);
     setError('');
 
-    // Simulate code validation
-    setTimeout(() => {
-      setLoading(false);
-      
-      // For demo: any 6+ character code is valid
-      if (code.length >= 6) {
+    try {
+      // Validate code with backend
+      const validation = await apiService.validateAttendanceCode(
+        code.toUpperCase(),
+        subject.id
+      );
+
+      if (validation.valid) {
+        // Code is valid, navigate to attendance form
         navigate('/attendance-form', {
           state: {
             code: code.toUpperCase(),
@@ -32,10 +41,11 @@ const CodeEntryScreen = () => {
             rollNumber
           }
         });
-      } else {
-        setError('Code must be at least 6 characters');
       }
-    }, 800);
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'Invalid or expired attendance code');
+    }
   };
 
   return (
@@ -87,7 +97,7 @@ const CodeEntryScreen = () => {
               color: "#6B7280",
               margin: 0
             }}>
-              {subject.name} - {subject.code}
+              {subject.subject_name} - {subject.subject_code}
             </p>
           )}
         </div>
@@ -116,7 +126,7 @@ const CodeEntryScreen = () => {
               setCode(e.target.value.toUpperCase());
               setError('');
             }}
-            maxLength={12}
+            maxLength={5}
             autoFocus={!scannedCode}
             style={{
               width: "100%",
@@ -230,6 +240,17 @@ const CodeEntryScreen = () => {
           </span>
         </div>
       </div>
+
+      <style>{`
+        @keyframes slideUp {
+          from { transform: translateY(30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 };
