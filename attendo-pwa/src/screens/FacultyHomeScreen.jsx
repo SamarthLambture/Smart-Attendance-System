@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import apiService from "../services/api";
 
 const FacultyHomeScreen = () => {
   const navigate = useNavigate();
@@ -8,31 +9,60 @@ const FacultyHomeScreen = () => {
   const [subjects, setSubjects] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [greeting, setGreeting] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const name = localStorage.getItem("faculty_name");
-    const id = localStorage.getItem("faculty_id");
-    const storedSubjects = localStorage.getItem("faculty_subjects");
-
-    if (!name && !id) {
-      navigate("/faculty-login");
-      return;
-    }
-
-    setFacultyName(name || id || "Faculty");
-    setFacultyId(id || "");
-    if (storedSubjects) setSubjects(JSON.parse(storedSubjects));
-
-    // Set greeting based on time
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting("Good Morning");
-    else if (hour < 17) setGreeting("Good Afternoon");
-    else setGreeting("Good Evening");
+    loadFacultyData();
   }, [navigate]);
+
+  const loadFacultyData = async () => {
+    try {
+      const name = localStorage.getItem("faculty_name");
+      const id = localStorage.getItem("faculty_id");
+      const facultyData = JSON.parse(localStorage.getItem("faculty_data") || "{}");
+
+      if (!name && !id) {
+        navigate("/faculty-login");
+        return;
+      }
+
+      setFacultyName(name || id || "Faculty");
+      setFacultyId(id || "");
+
+      // Fetch assigned subjects from backend
+      if (facultyData.email) {
+        try {
+          const assignedSubjects = await apiService.getFacultySubjects(facultyData.email);
+          setSubjects(assignedSubjects);
+          
+          // Also store in localStorage for offline access
+          localStorage.setItem("faculty_subjects", JSON.stringify(assignedSubjects));
+        } catch (err) {
+          console.error("Failed to fetch subjects:", err);
+          // Fallback to localStorage if API fails
+          const storedSubjects = localStorage.getItem("faculty_subjects");
+          if (storedSubjects) {
+            setSubjects(JSON.parse(storedSubjects));
+          }
+        }
+      }
+
+      // Set greeting based on time
+      const hour = new Date().getHours();
+      if (hour < 12) setGreeting("Good Morning");
+      else if (hour < 17) setGreeting("Good Afternoon");
+      else setGreeting("Good Evening");
+    } catch (err) {
+      console.error("Error loading faculty data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
       localStorage.clear();
+      sessionStorage.clear();
       navigate("/user-selection");
     }
   };
@@ -45,6 +75,23 @@ const FacultyHomeScreen = () => {
       } 
     });
   };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        background: "#F3F4F6", 
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "48px", marginBottom: "20px" }}>⏳</div>
+          <div style={{ fontSize: "18px", color: "#374151" }}>Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ background: "#F3F4F6", minHeight: "100vh" }}>
@@ -271,12 +318,42 @@ const FacultyHomeScreen = () => {
                   e.currentTarget.style.boxShadow = "0 20px 60px rgba(0, 0, 0, 0.15)";
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                  <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "15px" }}>
+                  <div style={{ flex: 1 }}>
                     <h4 style={{ fontWeight: "700", fontSize: "18px", color: "#1F2937", marginBottom: "5px" }}>
-                      {s.name}
+                      {s.subject_name}
                     </h4>
-                    <p style={{ color: "#6B7280", fontSize: "14px" }}>{s.code}</p>
+                    <p style={{ color: "#6B7280", fontSize: "14px", marginBottom: "5px" }}>
+                      {s.subject_code}
+                    </p>
+                    <div style={{ 
+                      display: "flex", 
+                      gap: "8px", 
+                      marginTop: "8px",
+                      flexWrap: "wrap"
+                    }}>
+                      <span style={{
+                        fontSize: "11px",
+                        padding: "4px 10px",
+                        background: "rgba(102, 126, 234, 0.1)",
+                        color: "#667eea",
+                        borderRadius: "12px",
+                        fontWeight: "600"
+                      }}>
+                        {s.branch === "Computer Science & Engineering" ? "CS" :
+                         s.branch === "Artifical Intelligence & Data Science" ? "AD" : "MC"}
+                      </span>
+                      <span style={{
+                        fontSize: "11px",
+                        padding: "4px 10px",
+                        background: "rgba(16, 185, 129, 0.1)",
+                        color: "#059669",
+                        borderRadius: "12px",
+                        fontWeight: "600"
+                      }}>
+                        {s.semester}
+                      </span>
+                    </div>
                   </div>
                   <div style={{
                     width: "50px",

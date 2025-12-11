@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import apiService from "../services/api";
 
 const StudentHomeScreen = () => {
   const navigate = useNavigate();
@@ -9,38 +10,68 @@ const StudentHomeScreen = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [greeting, setGreeting] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const name = localStorage.getItem("student_name");
-    const roll = localStorage.getItem("roll_number");
-    const storedSubjects = localStorage.getItem("selected_subjects");
-
-    if (!name && !roll) {
-      navigate("/student-login");
-      return;
-    }
-
-    setStudentName(name || roll || "Student");
-    setRollNumber(roll || "");
-    if (storedSubjects) setSubjects(JSON.parse(storedSubjects));
-
-    const msg = localStorage.getItem("attendance_success");
-    if (msg) {
-      setSuccessMessage(msg);
-      localStorage.removeItem("attendance_success");
-      setTimeout(() => setSuccessMessage(""), 4000);
-    }
-
-    // Set greeting based on time
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting("Good Morning");
-    else if (hour < 17) setGreeting("Good Afternoon");
-    else setGreeting("Good Evening");
+    loadStudentData();
   }, [navigate]);
+
+  const loadStudentData = async () => {
+    try {
+      const name = localStorage.getItem("student_name");
+      const roll = localStorage.getItem("roll_number");
+      const userData = JSON.parse(localStorage.getItem("user_data") || "{}");
+
+      if (!name && !roll) {
+        navigate("/student-login");
+        return;
+      }
+
+      setStudentName(name || roll || "Student");
+      setRollNumber(roll || "");
+
+      // Fetch enrolled subjects from backend
+      if (userData.email) {
+        try {
+          const enrolledSubjects = await apiService.getStudentSubjects(userData.email);
+          setSubjects(enrolledSubjects);
+          
+          // Also store in localStorage for offline access
+          localStorage.setItem("selected_subjects", JSON.stringify(enrolledSubjects));
+        } catch (err) {
+          console.error("Failed to fetch subjects:", err);
+          // Fallback to localStorage if API fails
+          const storedSubjects = localStorage.getItem("selected_subjects");
+          if (storedSubjects) {
+            setSubjects(JSON.parse(storedSubjects));
+          }
+        }
+      }
+
+      // Check for success message
+      const msg = localStorage.getItem("attendance_success");
+      if (msg) {
+        setSuccessMessage(msg);
+        localStorage.removeItem("attendance_success");
+        setTimeout(() => setSuccessMessage(""), 4000);
+      }
+
+      // Set greeting based on time
+      const hour = new Date().getHours();
+      if (hour < 12) setGreeting("Good Morning");
+      else if (hour < 17) setGreeting("Good Afternoon");
+      else setGreeting("Good Evening");
+    } catch (err) {
+      console.error("Error loading student data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
       localStorage.clear();
+      sessionStorage.clear();
       navigate("/user-selection");
     }
   };
@@ -56,6 +87,23 @@ const StudentHomeScreen = () => {
     };
     return attendanceData[subjectId] || { total: 10, present: 8, percentage: 80 };
   };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        background: "#F3F4F6", 
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "48px", marginBottom: "20px" }}>⏳</div>
+          <div style={{ fontSize: "18px", color: "#374151" }}>Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ background: "#F3F4F6", minHeight: "100vh" }}>
@@ -308,9 +356,9 @@ const StudentHomeScreen = () => {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
                     <div>
                       <h4 style={{ fontWeight: "700", fontSize: "18px", color: "#1F2937", marginBottom: "5px" }}>
-                        {s.name}
+                        {s.subject_name}
                       </h4>
-                      <p style={{ color: "#6B7280", fontSize: "14px" }}>{s.code}</p>
+                      <p style={{ color: "#6B7280", fontSize: "14px" }}>{s.subject_code}</p>
                     </div>
                     <div style={{
                       width: "50px",
@@ -326,7 +374,7 @@ const StudentHomeScreen = () => {
                     </div>
                   </div>
 
-                  {/* Attendance Stats for this subject */}
+                  {/* Attendance Stats */}
                   <div style={{
                     background: "linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)",
                     padding: "15px",

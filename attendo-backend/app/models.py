@@ -58,7 +58,7 @@ class Subject(Base):
     __tablename__ = "subjects"
     
     id = Column(Integer, primary_key=True, index=True)
-    subject_code = Column(String, unique=True, nullable=False, index=True)
+    subject_code = Column(String, nullable=False, index=True)
     subject_name = Column(String, nullable=False)
     branch = Column(String, nullable=False)
     semester = Column(String, nullable=False)

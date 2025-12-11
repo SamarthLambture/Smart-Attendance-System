@@ -184,6 +184,145 @@ class ApiService {
       throw error;
     }
   }
+
+  // Get All Subjects by Branch (all semesters/years)
+  async getSubjectsByBranch(branch) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/subjects/branch/${branch}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to fetch subjects');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get Subjects Error:', error);
+      throw error;
+    }
+  }
+
+  // Get Subjects by Branch and Semester (kept for compatibility)
+  async getSubjectsByBranchSemester(branch, semester) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/subjects/branch/${branch}/semester/${encodeURIComponent(semester)}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to fetch subjects');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get Subjects Error:', error);
+      throw error;
+    }
+  }
+
+  // Get Student Enrolled Subjects
+  async getStudentSubjects(email) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/subjects/student/${email}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to fetch student subjects');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get Student Subjects Error:', error);
+      throw error;
+    }
+  }
+
+  // Enroll Student in Subjects
+  async enrollStudentSubjects(studentEmail, subjectIds) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/subjects/student/enroll`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          student_email: studentEmail,
+          subject_ids: subjectIds,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to enroll subjects');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Enroll Subjects Error:', error);
+      throw error;
+    }
+  }
+
+  // Get All Subjects (for faculty - all branches, all semesters)
+  async getAllSubjects() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/subjects/all`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to fetch subjects');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get All Subjects Error:', error);
+      throw error;
+    }
+  }
+
+  // Get Faculty Assigned Subjects
+  async getFacultySubjects(email) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/subjects/faculty/${email}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to fetch faculty subjects');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Get Faculty Subjects Error:', error);
+      throw error;
+    }
+  }
+
+  // Assign Subjects to Faculty
+  async assignFacultySubjects(facultyEmail, subjectIds) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/subjects/faculty/assign`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          faculty_email: facultyEmail,
+          subject_ids: subjectIds,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to assign subjects');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Assign Subjects Error:', error);
+      throw error;
+    }
+  }
 }
 
 export default new ApiService();
