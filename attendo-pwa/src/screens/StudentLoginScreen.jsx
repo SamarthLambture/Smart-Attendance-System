@@ -2,21 +2,21 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiService from "../services/api";
 
-const StudentLoginScreen = () => {
+
+const EnhancedStudentLogin = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    rollNumber: "",
+    name: '',
+    email: '',
+    rollNumber: ''
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -65,102 +65,290 @@ const StudentLoginScreen = () => {
   };
 
   return (
-    <div className="screen-container">
-      <div className="card slide-up">
-        <div className="icon-container" style={{ margin: "0 auto 20px" }}>
-          <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
-              fill="#4F46E5"
-            />
-          </svg>
-        </div>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px'
+    }}>
+      {/* Background effects */}
+      <div style={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundImage: `
+          repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(102,126,234,0.02) 50px, rgba(102,126,234,0.02) 51px),
+          repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(102,126,234,0.02) 50px, rgba(102,126,234,0.02) 51px)
+        `,
+        animation: 'gridFlow 20s linear infinite'
+      }} />
 
-        <h1 className="title">Student Login</h1>
-        <p className="subtitle">Enter your details to continue</p>
+      {[...Array(3)].map((_, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            width: '400px',
+            height: '400px',
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${i === 0 ? 'rgba(102,126,234,0.15)' : 'rgba(118,75,162,0.15)'} 0%, transparent 70%)`,
+            filter: 'blur(60px)',
+            left: `${i * 40}%`,
+            top: `${i * 30}%`,
+            animation: `float ${8 + i * 2}s ease-in-out infinite`,
+            animationDelay: `${i * 2}s`
+          }}
+        />
+      ))}
 
-        {error && (
-          <div className="error-message" style={{ marginBottom: "20px" }}>
-            {error}
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        width: '100%',
+        maxWidth: '450px',
+        animation: 'slideUp 0.6s ease-out'
+      }}>
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+          backdropFilter: 'blur(30px)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '30px',
+          padding: '40px',
+          boxShadow: '0 30px 90px rgba(0,0,0,0.5)'
+        }}>
+          <div style={{
+            width: '80px',
+            height: '80px',
+            margin: '0 auto 30px',
+            borderRadius: '20px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '40px',
+            boxShadow: '0 15px 40px rgba(102,126,234,0.5)',
+            animation: 'scaleIn 0.6s ease-out'
+          }}>
+            👤
           </div>
-        )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label className="input-label">Full Name</label>
+          <h1 style={{
+            fontSize: '32px',
+            fontWeight: '800',
+            color: 'white',
+            textAlign: 'center',
+            margin: '0 0 10px 0'
+          }}>
+            Student Login
+          </h1>
+
+          <p style={{
+            fontSize: '16px',
+            color: 'rgba(255,255,255,0.5)',
+            textAlign: 'center',
+            margin: '0 0 35px 0'
+          }}>
+            Enter your details to continue
+          </p>
+
+          {error && (
+            <div style={{
+              padding: '15px',
+              background: 'rgba(239,68,68,0.15)',
+              border: '1px solid rgba(239,68,68,0.3)',
+              borderRadius: '15px',
+              color: '#FCA5A5',
+              marginBottom: '25px',
+              textAlign: 'center',
+              fontSize: '14px'
+            }}>
+              {error}
+            </div>
+          )}
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: 'rgba(255,255,255,0.7)',
+              marginBottom: '10px'
+            }}>
+              Full Name
+            </label>
             <input
               type="text"
               name="name"
-              className="input-field"
               placeholder="Enter your full name"
               value={formData.name}
               onChange={handleChange}
-              required
+              onFocus={() => setFocusedField('name')}
+              onBlur={() => setFocusedField(null)}
+              style={{
+                width: '100%',
+                padding: '16px 20px',
+                fontSize: '16px',
+                background: focusedField === 'name' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
+                border: `2px solid ${focusedField === 'name' ? '#667eea' : 'rgba(255,255,255,0.1)'}`,
+                borderRadius: '15px',
+                color: 'white',
+                outline: 'none',
+                transition: 'all 0.3s ease',
+                boxSizing: 'border-box',
+                boxShadow: focusedField === 'name' ? '0 0 0 4px rgba(102,126,234,0.1)' : 'none'
+              }}
             />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Institute Email</label>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: 'rgba(255,255,255,0.7)',
+              marginBottom: '10px'
+            }}>
+              Institute Email
+            </label>
             <input
               type="email"
               name="email"
-              className="input-field"
               placeholder="cs24b1027@iiitr.ac.in"
               value={formData.email}
               onChange={handleChange}
-              required
+              onFocus={() => setFocusedField('email')}
+              onBlur={() => setFocusedField(null)}
+              style={{
+                width: '100%',
+                padding: '16px 20px',
+                fontSize: '16px',
+                background: focusedField === 'email' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
+                border: `2px solid ${focusedField === 'email' ? '#667eea' : 'rgba(255,255,255,0.1)'}`,
+                borderRadius: '15px',
+                color: 'white',
+                outline: 'none',
+                transition: 'all 0.3s ease',
+                boxSizing: 'border-box',
+                boxShadow: focusedField === 'email' ? '0 0 0 4px rgba(102,126,234,0.1)' : 'none'
+              }}
             />
-            <div style={{ 
-              fontSize: "12px", 
-              color: "#6B7280", 
-              marginTop: "5px" 
-            }}>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '8px' }}>
               Format: &lt;branch&gt;&lt;year&gt;b&lt;number&gt;@iiitr.ac.in
             </div>
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Roll Number</label>
+          <div style={{ marginBottom: '30px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: 'rgba(255,255,255,0.7)',
+              marginBottom: '10px'
+            }}>
+              Roll Number
+            </label>
             <input
               type="text"
               name="rollNumber"
-              className="input-field"
               placeholder="Enter your roll number"
               value={formData.rollNumber}
               onChange={handleChange}
-              required
+              onFocus={() => setFocusedField('rollNumber')}
+              onBlur={() => setFocusedField(null)}
+              style={{
+                width: '100%',
+                padding: '16px 20px',
+                fontSize: '16px',
+                background: focusedField === 'rollNumber' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.05)',
+                border: `2px solid ${focusedField === 'rollNumber' ? '#667eea' : 'rgba(255,255,255,0.1)'}`,
+                borderRadius: '15px',
+                color: 'white',
+                outline: 'none',
+                transition: 'all 0.3s ease',
+                boxSizing: 'border-box',
+                boxShadow: focusedField === 'rollNumber' ? '0 0 0 4px rgba(102,126,234,0.1)' : 'none'
+              }}
             />
           </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-primary"
+          <button
+            onClick={handleSubmit}
             disabled={loading}
+            style={{
+              width: '100%',
+              padding: '18px',
+              fontSize: '18px',
+              fontWeight: '700',
+              color: 'white',
+              background: loading ? 'rgba(102,126,234,0.5)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              borderRadius: '15px',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: loading ? 'none' : '0 10px 30px rgba(102,126,234,0.4)',
+              marginBottom: '20px'
+            }}
           >
-            {loading ? "Sending OTP..." : "Send OTP"}
+            {loading ? 'Sending OTP...' : 'Send OTP'}
           </button>
 
-          <div style={{ textAlign: "center", marginTop: "20px" }}>
-            <span style={{ color: "#6B7280" }}>Don't have an account? </span>
-            <span 
-              className="link"
+          <div style={{ textAlign: 'center', fontSize: '14px' }}>
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Don't have an account? </span>
+            <span style={{ color: '#667eea', fontWeight: '600', cursor: 'pointer' }} 
               onClick={() => navigate("/student-register")}
             >
               Register here
             </span>
           </div>
-        </form>
 
-        <button 
-          className="btn btn-white"
-          onClick={() => navigate("/user-selection")}
-          style={{ marginTop: "15px" }}
-        >
-          Back
-        </button>
+          <button
+            style={{
+              width: '100%',
+              marginTop: '15px',
+              padding: '16px',
+              fontSize: '16px',
+              fontWeight: '600',
+              color: 'rgba(255,255,255,0.7)',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '15px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onClick={() => navigate("/user-selection")}
+          >
+            Back
+          </button>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.8); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(30px, -30px); }
+        }
+        @keyframes gridFlow {
+          from { transform: translateY(0); }
+          to { transform: translateY(50px); }
+        }
+        input::placeholder {
+          color: rgba(255,255,255,0.3);
+        }
+      `}</style>
     </div>
   );
 };
 
-export default StudentLoginScreen;
+export default EnhancedStudentLogin;

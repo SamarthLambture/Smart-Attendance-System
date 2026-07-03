@@ -28,7 +28,7 @@ class StudentCreate(StudentBase):
     
     @validator('branch')
     def validate_branch(cls, v):
-        valid_branches = ["Computer Science & Engineering", "Artifical Intelligence & Data Science", "Mathematics & Computing"]
+        valid_branches = ["Computer Science & Engineering", "Artificial Intelligence & Data Science", "Mathematics & Computing"]
         if v not in valid_branches:
             raise ValueError(f'Invalid branch. Must be one of: {", ".join(valid_branches)}')
         return v

@@ -43,7 +43,7 @@ async def get_subjects_by_branch(
     # Map branch codes to full names
     branch_mapping = {
         "CS": "Computer Science & Engineering",
-        "AD": "Artifical Intelligence & Data Science",
+        "AD": "Artificial Intelligence & Data Science",
         "MC": "Mathematics & Computing"
     }
     
@@ -77,7 +77,7 @@ async def get_subjects_by_branch_semester(
     # Map branch codes to full names
     branch_mapping = {
         "CS": "Computer Science & Engineering",
-        "AD": "Artifical Intelligence & Data Science",
+        "AD": "Artificial Intelligence & Data Science",
         "MC": "Mathematics & Computing"
     }
     

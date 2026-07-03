@@ -8,8 +8,6 @@ from app.models import Subject
 
 def populate_subjects():
     db = SessionLocal()
-    db.query(Subject).delete()
-    db.commit()
 
     try:
         # Check if subjects already exist

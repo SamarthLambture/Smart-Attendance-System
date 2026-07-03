@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     OTP_EXPIRY_MINUTES: int = 10
     
     # CORS
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173", "http://192.168.0.102:3000", "http://192.168.0.102:5173"]
+    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173", "http://192.168.0.100:3000",]
     
     # Valid branches
     VALID_BRANCHES: List[str] = ["CS", "AD", "MC"]
@@ -35,3 +35,9 @@ class Settings(BaseSettings):
         case_sensitive = True
 
 settings = Settings()
+
+print("MAIL_USERNAME:", settings.MAIL_USERNAME)
+print("MAIL_FROM:", settings.MAIL_FROM)
+print("MAIL_SERVER:", settings.MAIL_SERVER)
+print("MAIL_PORT:", settings.MAIL_PORT)
+print("MAIL_PASSWORD loaded:", bool(settings.MAIL_PASSWORD))
