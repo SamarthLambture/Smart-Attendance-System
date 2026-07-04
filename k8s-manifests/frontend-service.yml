@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: service
+metadata:
+  name: frontend-service
+  namespace: attendo-ns
+  labels:
+    app: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000

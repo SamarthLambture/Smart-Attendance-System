@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: deployment
+metadata:
+  name: backend-deployment
+  namespace: attendo-ns
+  labels:
+    app: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend-pod
+          image: backend-image:latest
+          ports:
+            - containerPort: 8000
