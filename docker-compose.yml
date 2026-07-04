@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: attendo-frontend
+    ports:
+      - "3000:80"
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - attendo-network
+
+  backend:
+    build: ./backend
+    container_name: attendo-backend
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      - database
+    networks:
+      - attendo-network
+
+  database:
+    image: postgres:13
+    container_name: attendo-database
+    environment:
+      POSTGRES_USER: attendo_user
+      POSTGRES_PASSWORD: your_secure_password
+      POSTGRES_DB: attendo_db
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - attendo-network
+    volumes:
+      - attendo-db-data:/var/lib/postgresql/data
+
+networks:
+  attendo-network:
+volumes:
+  attendo-db-data:
