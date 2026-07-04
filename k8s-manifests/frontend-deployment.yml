@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: deployment
+kind: Deployment
 metadata:
   name: frontend-deployment
   namespace: attendo-ns
@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: frontend-pod
-          image: frontend-image:latest
+          image: ghcr.io/samarthlambture/attendo-frontend:v1
           ports:
-            - containerPort: 3000
+            - containerPort: 80

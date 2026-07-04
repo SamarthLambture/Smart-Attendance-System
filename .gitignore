@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 .env
 attendo-backend/venv/
+k8s-manifests/secret.yml

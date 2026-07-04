@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: deployment
+kind: Deployment
 metadata:
   name: backend-deployment
   namespace: attendo-ns
@@ -17,6 +17,11 @@ spec:
     spec:
       containers:
         - name: backend-pod
-          image: backend-image:latest
+          image: ghcr.io/samarthlambture/attendo-backend:v1
           ports:
             - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: config
+            - secretRef:
+                name: secret
