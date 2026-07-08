@@ -25,3 +25,10 @@ dist-ssr
 .env
 attendo-backend/venv/
 k8s-manifests/secret.yml
+
+# Terraform files
+.terraform/
+bastion-key.pem
+*.tfstate
+*.hcl
+*.backup
