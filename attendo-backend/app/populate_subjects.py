@@ -1,6 +1,7 @@
 """
-Populate subjects in database for all branches and semesters
-Run this script once to add all subjects
+Populate subjects in database for all branches and semesters.
+Idempotent: safe to run on every container startup.
+Automatically skips if subjects already exist — no manual step needed.
 """
 
 from app.database import SessionLocal
@@ -10,18 +11,12 @@ def populate_subjects():
     db = SessionLocal()
 
     try:
-        # Check if subjects already exist
+        # Check if subjects already exist — skip silently if so (no input() prompt,
+        # since containers have no TTY and would hang forever waiting for input)
         existing = db.query(Subject).count()
         if existing > 0:
-            print(f"⚠️ Database already has {existing} subjects.")
-            response = input("Do you want to clear and repopulate? (yes/no): ")
-            if response.lower() != 'yes':
-                print("Aborted.")
-                return
-            
-            db.query(Subject).delete()
-            db.commit()
-            print("✅ Cleared existing subjects")
+            print(f"Subjects already populated ({existing} rows). Skipping.")
+            return
 
         subjects_data = []
 
@@ -263,14 +258,15 @@ def populate_subjects():
         db.add_all(subjects_data)
         db.commit()
 
-        print(f"\n✅ Added {len(subjects_data)} subjects successfully!\n")
+        print(f"Added {len(subjects_data)} subjects successfully!")
+
+    except Exception as e:
+        db.rollback()
+        print(f"Failed to populate subjects: {e}")
+        raise
 
     finally:
         db.close()
 
 if __name__ == "__main__":
-    print("="*60)
-    print("POPULATE SUBJECTS DATABASE")
-    print("="*60)
     populate_subjects()
-    print("\n✨ DONE!\n")

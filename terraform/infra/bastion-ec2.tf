@@ -1,0 +1,52 @@
+resource "tls_private_key" "bastion_key" {
+    algorithm = "RSA"
+    rsa_bits = 4096
+}
+
+resource "aws_key_pair" "bastion_key_pair" {
+    key_name = "bastion-key"
+    public_key = tls_private_key.bastion_key.public_key_openssh
+}
+
+resource "local_file" "bastion_private_key" {
+    content = tls_private_key.bastion_key.private_key_pem
+    filename = "bastion-key.pem"
+    file_permission = "0400"
+}
+
+resource "aws_security_group" "bastion_sg" {
+    name = "bastion-sg"
+    vpc_id = module.vpc.vpc_id
+    ingress {
+        description = "SSH from this machine"
+        from_port = 22
+        to_port = 22
+        protocol = "tcp"
+        cidr_blocks = ["${chomp(data.http.my_ip.response_body)}/32"]
+    }   
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    tags = {
+        Name = "bastion-sg"
+    }
+}
+
+resource "aws_instance" "bastion_host" {
+  ami                    = "ami-024ebedf48d280810" # Update to a valid AMI for your region
+  instance_type          = "t3.medium"
+
+  subnet_id              = module.vpc.public_subnets[0]
+  vpc_security_group_ids = [aws_security_group.bastion_sg.id]
+  key_name               = aws_key_pair.bastion_key_pair.key_name
+
+  monitoring = true
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "bastion-host"
+  }
+}

@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     OTP_EXPIRY_MINUTES: int = 10
     
     # CORS
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173", "http://192.168.0.100:3000",]
+    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173", "http://192.168.0.100:3000", "http://40.192.27.85:3000"]
     
     # Valid branches
     VALID_BRANCHES: List[str] = ["CS", "AD", "MC"]
