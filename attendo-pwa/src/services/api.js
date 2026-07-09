@@ -4,14 +4,19 @@
 
 // Automatically detect environment
 const getApiBaseUrl = () => {
-  // Check if running on localhost (laptop)
+  // Allow override via build-time env var (set in .env.production)
+  if (import.meta.env.VITE_API_URL) {
+    return `${import.meta.env.VITE_API_URL}/api`;
+  }
+
+  // Local dev on laptop
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return 'http://localhost:8000/api';
   }
-  
-  // If accessing via IP (phone), use the same IP for API
-  const hostname = window.location.hostname;
-  return `http://${hostname}:8000/api`;
+
+  // Fallback: same protocol as the page (avoids mixed-content blocks),
+  // same hostname, no manual port (assumes reverse proxy/ALB routes /api)
+  return `${window.location.protocol}//${window.location.hostname}/api`;
 };
 
 const API_BASE_URL = getApiBaseUrl();

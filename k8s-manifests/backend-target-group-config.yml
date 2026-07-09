@@ -1,0 +1,10 @@
+apiVersion: gateway.k8s.aws/v1beta1
+kind: TargetGroupConfiguration
+metadata:
+  name: backend-tgc
+  namespace: attendo-ns
+spec:
+  targetReference:
+    name: backend-service
+  defaultConfiguration:
+    targetType: ip

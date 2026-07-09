@@ -1,0 +1,22 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: frontend-route
+  namespace: attendo-ns
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: attendo.attendoapp.site
+spec:
+  parentRefs:
+    - name: app-alb-gateway
+      namespace: default
+      sectionName: https
+  hostnames:
+    - attendo.attendoapp.site
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: frontend-service
+          port: 80
