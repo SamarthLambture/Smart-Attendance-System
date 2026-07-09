@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Table, Float
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Table, Float, LargeBinary
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
@@ -113,3 +113,12 @@ class OTP(Base):
     is_used = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     expires_at = Column(DateTime, nullable=False)
+
+class FaceEmbedding(Base):
+    __tablename__ = "face_embeddings"
+
+    roll_number = Column(String, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    photo_path = Column(String, nullable=True)
+    embedding = Column(LargeBinary, nullable=False)  # 512-D float32 vector, stored as raw bytes
