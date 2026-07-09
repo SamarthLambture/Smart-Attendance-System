@@ -7,8 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  FRONTEND_IMAGE_NAME: ${{ github.repository_owner }}/attendo-frontend
-  BACKEND_IMAGE_NAME: ${{ github.repository_owner }}/attendo-backend
+  FRONTEND_IMAGE_NAME: samarthlambture/attendo-frontend
+  BACKEND_IMAGE_NAME: samarthlambture/attendo-backend
 
 jobs:
   build-scan-push:
