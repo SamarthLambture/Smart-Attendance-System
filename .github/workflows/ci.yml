@@ -88,7 +88,7 @@ jobs:
         run: |
           git config --global user.name 'GitHub Actions Bot'
           git config --global user.email 'actions@github.com'
-          git add k8s/frontend-deployment.yml k8s/backend-deployment.yml
+          git add k8s-manifests/frontend-deployment.yml k8s-manifests/backend-deployment.yml
           git commit -m "chore(k8s): update image tags to ${{ github.sha }} [skip ci]" || echo "No changes to commit"
           git push origin main
 
