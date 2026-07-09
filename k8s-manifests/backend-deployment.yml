@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: backend-pod
-          image: ghcr.io/samarthlambture/attendo-backend:v5
+          image: ghcr.io/samarthlambture/attendo-backend:v1
           ports:
             - containerPort: 8000
           envFrom:
