@@ -80,8 +80,8 @@ jobs:
       - name: Update Kubernetes Manifests
         run: |
           # Use sed to replace the image tag with the new Git SHA
-          sed -i "s|image: ghcr.io/.*/attendo-frontend:.*|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}|g" k8s/frontend-deployment.yml
-          sed -i "s|image: ghcr.io/.*/attendo-backend:.*|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}|g" k8s/backend-deployment.yml
+          sed -i "s|image: ghcr.io/.*/attendo-frontend:.*|image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}|g" k8s-manifests/frontend-deployment.yml
+          sed -i "s|image: ghcr.io/.*/attendo-backend:.*|image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}|g" k8s-manifests/backend-deployment.yml
 
       # 10 & 11. Commit Updated Image Tags & Push Manifest Changes
       - name: Commit and Push Manifest Changes
