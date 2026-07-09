@@ -4,7 +4,8 @@ metadata:
   name: config
   namespace: attendo-ns
 data:
-  FRONTEND_URL: "http://frontend-service"
+  FRONTEND_URL: "https://attendo.attendoapp.site"
+  ALLOWED_ORIGINS: '["https://attendo.attendoapp.site","http://localhost:5173","http://localhost:3000"]'
   MAIL_USERNAME: "lambture5522@gmail.com"
   MAIL_FROM: "lambture5522@gmail.com"
   MAIL_PORT: "587"
