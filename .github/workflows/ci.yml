@@ -35,12 +35,12 @@ jobs:
       # 3. Build Frontend Docker Image
       - name: Build Frontend Image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} ./frontend
+          docker build -t ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} ./attendo-pwa
 
       # 4. Build Backend Docker Image
       - name: Build Backend Image
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }} ./backend
+          docker build -t ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }} ./attendo-backend
 
       # 5. Trivy Scan Frontend (continue-on-error: true)
       - name: Run Trivy vulnerability scanner on Frontend
