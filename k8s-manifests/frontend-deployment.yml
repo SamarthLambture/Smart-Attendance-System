@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: frontend-pod
-          image: ghcr.io/samarthlambture/attendo-frontend:a030daad9cc9b50e76dac2b22f437ea394493b3f
+          image: ghcr.io/samarthlambture/attendo-frontend:103e6bd7b23a64bf6797bb7fa0f26344f38e6eff
           ports:
             - containerPort: 80
