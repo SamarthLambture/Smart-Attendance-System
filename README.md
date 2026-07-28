@@ -106,14 +106,10 @@ Proxy attendance is a decades-old problem on college campuses — one student si
 
 ## 🏗 System Architecture
 
-<p align="center">
-  <img src="docs/images/architecture-overview.png" alt="Attendo minimalistic architecture — CI/CD, VPC, EKS, monitoring" width="100%">
-</p>
-
 The system runs as two containerized services (frontend + backend) behind an AWS Application Load Balancer, deployed into a private-subnet EKS cluster, with GitOps-driven delivery and full observability:
 
 <p align="center">
-  <img src="docs/images/full-devops-workflow.png" alt="End-to-end DevOps workflow: CI, CD, GitOps, EKS, monitoring" width="100%">
+  <img src="docs/images/full-devops-workflow.gif" alt="End-to-end DevOps workflow: CI, CD, GitOps, EKS, monitoring" width="100%">
 </p>
 
 **Request flow:** `User → Route 53 → ALB → Gateway API → EKS (frontend & backend pods) → PostgreSQL`
@@ -153,6 +149,10 @@ With CI in place, the next step was deploying Attendo on **production-style AWS 
 - Bastion Host (EC2) for secure, controlled cluster access
 - Amazon **EKS** cluster running in private subnets with managed node groups
 - Application Load Balancer (ALB) + Gateway API + ExternalDNS for automated domain management
+
+<p align="center">
+  <img src="docs/images/architecture-overview.png" alt="ArgoCD application resource tree — Attendo" width="90%">
+</p>
 
 **Kubernetes & GitOps:**
 - Kubernetes Deployments & Services for both frontend and backend
