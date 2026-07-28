@@ -109,7 +109,7 @@ Proxy attendance is a decades-old problem on college campuses — one student si
 The system runs as two containerized services (frontend + backend) behind an AWS Application Load Balancer, deployed into a private-subnet EKS cluster, with GitOps-driven delivery and full observability:
 
 <p align="center">
-  <img src="docs/images/full-devops-workflow.gif" alt="End-to-end DevOps workflow: CI, CD, GitOps, EKS, monitoring" width="100%">
+  <img src="docs/images/V5.gif" alt="End-to-end DevOps workflow: CI, CD, GitOps, EKS, monitoring" width="100%">
 </p>
 
 **Request flow:** `User → Route 53 → ALB → Gateway API → EKS (frontend & backend pods) → PostgreSQL`
